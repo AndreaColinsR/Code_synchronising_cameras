@@ -25,7 +25,7 @@ Este repositorio contiene el código preliminar para la reconstruir la marcha en
    - Durante el video coloque el tablero de ajedrez en frente de las dos cámaras y trate de moverlo lo más posible para que cubra el área por donde caminara el sujeto.
    - Por favor cuide que el tablero de ajedrez se vea desde las dos cámaras.
     Puede ver un ejemplo de un video de calibración en la carpeta Calibration. El video Calib_video1contat.avi muestra los dos videos sincronizados.
-   Si quiere grabar un nuevo video para reemplazar el anterior, sólo corra el programa de nuevo. Si quiere grabar otro video de calibración como backup, cambie la linea de codigo  "Nvideo = '1'" a "Nvideo = '2'" u otro número. 
+   Si quiere grabar un nuevo video para reemplazar el anterior, sólo corra el programa de nuevo. Si quiere grabar otro video de calibración como backup, cambie la linea de codigo  `Nvideo = '1'` a `Nvideo = '2'` u otro número. 
 
 **Por favor no mueva las cámaras una vez que grabó los videos de calibración. Si mueve las cámaras entonces tendrá que grabar un nuevo video de calibración.**
 
