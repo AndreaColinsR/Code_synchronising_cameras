@@ -37,7 +37,7 @@ def calibrate_both_cameras(VideoNameA,VideoNameB):
     world_scaling = 30. #change this to the real world square size.
 
     # termination criteria
-    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 50, 0.001)
  
     # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
     objp = np.zeros((6*8,3), np.float32)
@@ -97,7 +97,7 @@ def calibrate_both_cameras(VideoNameA,VideoNameB):
 
 
 # Video name
-Nvideo = '1'
+Nvideo = '3'
 
 #VideoA = '.\Calibration\Example_video_5a.avi'
 #VideoB = '.\Calibration\Example_video_5b.avi'
@@ -107,26 +107,26 @@ VideoB = '.\Calibration\Calib_video_'+Nvideo+'B.avi'
 print(VideoA)
 
 
-# ##2. Detect corners of the chessboard
+# ## 2. Detect corners of the chessboard
 
-# In[4]:
+# In[ ]:
 
 
 objpoints,imgpointsA,greyFrameA, retA,mtxA,distA,imgpointsB,greyFrameB, retB,mtxB,distB = calibrate_both_cameras(VideoA,VideoB)
 len(imgpointsA)
 
 
-# In[5]:
+# In[ ]:
 
 
 stereocalibration_flags = cv.CALIB_FIX_INTRINSIC
-criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 100, 0.0001)
 ret3D, CM1, dist1, CM2, dist2, R, T, E, F = cv.stereoCalibrate(objpoints, imgpointsA, imgpointsB, mtxA, distA,
                                                                  mtxB, distB, greyFrameA.shape[::-1], criteria = criteria, flags = stereocalibration_flags)
  
 
 
-# In[6]:
+# In[ ]:
 
 
 print(retA)
@@ -139,10 +139,10 @@ P1 = mtxA @ RT1 #projection matrix for C1
 #RT matrix for C2 is the R and T obtained from stereo calibration.
 RT2 = np.concatenate([R, T], axis = -1)
 P2 = mtxB @ RT2 #projection matrix for C2
-np.savez('.\Calibration\Calibration_parameters', ret3D=ret3D, CM1=CM1,dist1=dist1,CM2=CM2,dist2=dist2,R=R,T=T,E=E, F=F,P1 = P1, P2 = P2)
+np.savez('.\Calibration\Calibration_parameters_'+Nvideo, ret3D=ret3D, CM1=CM1,dist1=dist1,CM2=CM2,dist2=dist2,R=R,T=T,E=E, F=F,P1 = P1, P2 = P2)
 
 
-# In[7]:
+# In[ ]:
 
 
 Nframes = len(imgpointsA)-1
@@ -158,7 +158,7 @@ ax2.plot(imgpointsB[Nframes][0][0][0],imgpointsB[Nframes][0][0][1],'.r')
 #print(imgpointsA[Nframes][0][0])
 
 
-# In[8]:
+# In[ ]:
 
 
 from mpl_toolkits.mplot3d import Axes3D
@@ -169,7 +169,7 @@ colours=['red','orange','yellow','lime','cyan','blue']
 fig2 = plt.figure()
 ax = fig2.add_subplot(111, projection='3d')
 
-for iframes in np.arange(0,2):
+for iframes in np.arange(0,Nframes):
     D3Points=[]
     
     for i in np.arange(0,8*6):
@@ -192,7 +192,7 @@ for iframes in np.arange(0,2):
     plt.show()
     plt.pause(0.01)
     figname='.\Calibration\Fig_'+str(iframes)+'.png'
-    plt.savefig(figname, bbox_inches='tight')
+    #plt.savefig(figname, bbox_inches='tight')
     ax.cla()
 
 

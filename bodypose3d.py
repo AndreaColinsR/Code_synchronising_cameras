@@ -7,7 +7,7 @@ from utils import DLT, write_keypoints_to_disk
 
 
 #this will load the sample videos if no camera ID is given
-Nvideo = '5'
+Nvideo = '4'
 Video_nameA = '.\Videos\Example_videoA'+Nvideo+'.avi'
 Video_nameB = '.\Videos\Example_videoB'+Nvideo+'.avi'
 input_stream1 = Video_nameA
@@ -20,7 +20,12 @@ mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
 
-npz = np.load('.\Calibration\Calibration_parameters.npz')
+Calib_n = 2
+Calib_video = '.\Calibration\Calibration_parameters_2.npz'
+print(Calib_video)
+npz = np.load(Calib_video)
+
+
 P0=npz['P1']
 P1=npz['P2']
 R=npz['R']
