@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from utils import DLT
 import cv2 as cv
+from scipy.io import savemat
 plt.style.use('seaborn-v0_8')
 
 
@@ -49,7 +50,7 @@ def z_rotation(vector,theta):
     R = np.array([[np.cos(theta), -np.sin(theta),0],[np.sin(theta), np.cos(theta),0],[0,0,1]])
     return np.dot(R,vector)
     
-def visualize_3d(p3ds,p3dsf,capF,capS):
+def visualize_3d(p3ds,p3dsf,capF,capS,t):
 
     """Now visualize in 3D"""
     torso = [[0, 1] , [1, 7], [7, 6], [6, 0]]
@@ -62,40 +63,66 @@ def visualize_3d(p3ds,p3dsf,capF,capS):
 
 
     counter=1
+    tmp=p3ds.shape
+    Nframes=tmp[0]
+    t=t[0:Nframes]
+
+    
+    ## Translate skeleton to the origin of the system
+    p3ds[0,:,:]=p3ds[1,:,:]
+
+    tmp_nan=[];
+    for i in np.arange(0,Nframes):
+        if np.sum(p3ds[i,0,:])>-3.1 and np.sum(p3ds[i,0,:])<-2.9:
+            tmp_nan.append(i)
+            
+    p3ds=np.delete(p3ds,tmp_nan, axis=0)
+    t = np.delete(t, tmp_nan)
 
     p3ds = p3ds-p3ds[0,10,:]
-
+    
     ## commpute left knee angle
     #6-8 vs 8-10
+    
     tmp=p3ds.shape
     Nframes=tmp[0]
     l_knee=np.zeros((Nframes,))
     r_knee=np.zeros((Nframes,))
+
+    l_hip=np.zeros((Nframes,))
+    r_hip=np.zeros((Nframes,))
+    
     for i in np.arange(0,Nframes):
+            
         l_knee[i]=angle_between(p3ds[i,6,:]-p3ds[i,8,:], p3ds[i,8,:]-p3ds[i,10,:])
         r_knee[i]=angle_between(p3ds[i,7,:]-p3ds[i,9,:], p3ds[i,9,:]-p3ds[i,11,:])
 
+        l_hip[i]=angle_between(p3ds[i,0,:]-p3ds[i,6,:], p3ds[i,6,:]-p3ds[i,8,:])
+        r_hip[i]=angle_between(p3ds[i,1,:]-p3ds[i,7,:], p3ds[i,7,:]-p3ds[i,9,:])
+
     fig0 = plt.figure()
-    plt.plot(r_knee*180/np.pi,'r',label='right knee')
-    plt.plot(l_knee*180/np.pi,'k',label='left knee')
-    plt.xlabel('Frame Number')
-    plt.ylabel('Angle [o]')
+    plt.subplot(211)
+    plt.plot(t,r_hip*180/np.pi,'r',label='Rodilla derecha')
+    plt.plot(t,l_hip*180/np.pi,'k',label='Rodilla izquierda')
+    
+    plt.subplot(212)
+    plt.plot(t,r_knee*180/np.pi,'r',label='Rodilla derecha')
+    plt.plot(t,l_knee*180/np.pi,'k',label='Rodilla izquierda')
+    plt.xlabel('Tiempo [s]')
+    plt.ylabel('Angulo [o]')
     plt.legend(loc="upper left")
     plt.ylim(0, 150)
-    plt.pause(10)
-    #plt.plot(p3ds[:,10,0],'b')
-    #plt.plot(p3ds[:,10,1],'g')
-    #plt.plot(p3ds[:,10,2],'r')
+
+    
+    #plt.plot(t,p3ds[:,10,0],'b')
+    #plt.plot(t,p3ds[:,10,1],'g')
+    #plt.plot(t,p3ds[:,10,2],'r')
+    plt.pause(1)
     
 
 
 
     from mpl_toolkits.mplot3d import Axes3D
-    #startF=1
-    #capF.set(cv.CAP_PROP_POS_FRAMES)
-    #print('First frame of F = ',capF.get(cv.CAP_PROP_POS_FRAMES))   
-    #capS.set(cv.CAP_PROP_POS_FRAMES)
-    #print('First frame of S = ',capS.get(cv.CAP_PROP_POS_FRAMES))
     
     fig = plt.figure()
     axF = fig.add_subplot(221)
@@ -110,10 +137,9 @@ def visualize_3d(p3ds,p3dsf,capF,capS):
     new_z = z_rotation(new_z, -alpha_z)
 
     
-    Mins = np.min(np.min(p3ds,0),0)-500
-    Maxs = np.max(np.max(p3ds,0),0)+500
-   
-    
+    Mins = np.min(np.min(p3ds,0),0)-100
+    Maxs = np.max(np.max(p3ds,0),0)+100
+
     for framenum, kpts3d in enumerate(p3ds):
         ret, frameF = capF.read()
         ret, frameS = capS.read()
@@ -144,14 +170,16 @@ def visualize_3d(p3ds,p3dsf,capF,capS):
 
         #ax.set_axis_off()
         #ax2.set_axis_off()
+        ####################### right plot (front)
         ax2.set_xlim3d([Mins[0], Maxs[0]])
         ax2.set_ylim3d([Mins[1], Maxs[1]])
         ax2.set_zlim3d([Mins[2], Maxs[2]])
-        ax2.view_init(elev=-78, azim=-91,roll=-0)
+        ax2.view_init(elev=-38, azim=-91,roll=40)
+        #ax2.view_init(elev=-0, azim=0,roll=-110)
         #ax.set_xticks([])
         #ax.set_yticks([])
         #ax.set_zticks([])
-
+        ####################### Left plot (side)
         ax.set_xlim3d([Mins[0], Maxs[0]])
         ax.set_ylim3d([Mins[1], Maxs[1]])
         ax.set_zlim3d([Mins[2], Maxs[2]])
@@ -159,10 +187,13 @@ def visualize_3d(p3ds,p3dsf,capF,capS):
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')
         
-        ax.view_init(elev=-160, azim=20,roll=-100)
+        ax.view_init(elev=-163, azim=0,roll=-90)
+        plt.title(framenum)
         figname='.\Frames\Fig_'+str(counter)+'.png'
         plt.savefig(figname, bbox_inches='tight')
-        plt.pause(0.05)
+        plt.pause(0.005)
+        if framenum==1:
+            plt.pause(0.05)
         ax.cla()
         ax2.cla()
         axF.cla()
@@ -171,15 +202,20 @@ def visualize_3d(p3ds,p3dsf,capF,capS):
         counter=counter+1
 
 if __name__ == '__main__':
-    Nvideo = '4'
-    capF = cv.VideoCapture('.\Videos\Example_videoA'+Nvideo+'.avi')
-    capS = cv.VideoCapture('.\Videos\Example_videoB'+Nvideo+'.avi')
+    Nvideo = '3'
+    capF = cv.VideoCapture(r'.\Videos\Usach_1\Example_videoA'+Nvideo+'.avi')
+    capS = cv.VideoCapture(r'.\Videos\Usach_1\Example_videoB'+Nvideo+'.avi')
     
     #npz = np.load('Floor_points.npz')
     #connections=npz['connections']
     #p3dsf=npz['p3dsf']
+    npz = np.load(r'.\Videos\Usach_1\Example_video_'+Nvideo+'_t.npz')
+    t = npz['t']
     p3ds = read_keypoints('.\Tracking\kpts_3d_'+Nvideo+'.dat')
     p3dsf = read_keypoints('.\Tracking\kpts_3d_'+Nvideo+'.dat')
-    visualize_3d(p3ds,p3dsf,capF,capS)
+    mdic = {"body_pose": p3ds,"t":t}
+    savemat(".\pose_3d_video_"+Nvideo+".mat", mdic)
+    p3ds
+    visualize_3d(p3ds,p3dsf,capF,capS,t)
     capF.release() 
     capS.release()
