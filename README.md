@@ -29,6 +29,34 @@ Este repositorio contiene el código preliminar para la reconstruir la marcha en
 
 **Por favor no mueva las cámaras una vez que grabó los videos de calibración. Si mueve las cámaras entonces tendrá que grabar un nuevo video de calibración.**
 
-  4. Para grabar un video de un paciente use el notebook `Record_video.ipynb`. Abra el notebook presione Run y el codigo automaticamente registrara un video de XX segundos desde las dos camaras. 
-     
+
+  4. Para grabar un video de un paciente use el notebook `Record_video.ipynb`. Abra el notebook presione Run y el codigo automaticamente registrara un video de XX segundos desde las dos camaras.
   5. Para grabar un nuevo video, cambie el numero del video en el código (Sorry! Cambiaré esto en versiones futuras). Segundo segmento cambiar `Nvideo= '6'` por otro número. Si no realiza este paso, se sobreescribirá el video anterior. 
+
+
+
+# Reconstrucción en 3D y visualización de resultados 
+
+Para hacer la reconstrucción en 3D de un video ya grabado se debe usar mediapipe. Por simplicidad, es mejor tener todo en un ambiente virtual. Una vez instalado el ambiente virtual y mediapipe, las siguientes instrucciones deberían producir una ventana con la visualización del video y la reconstrucción en 3D. Por defecto, el siguiente código hará la reconstrucción del video 4 en la carpeta `Videos/Usach_1/`
+
+```python
+# open command prompt and activate virtual environment
+.\Documents\Virtual_Env_Py\Scripts\activate
+
+# Python version Python 3.9.0
+# Medida pipe Name: mediapipe
+#Version: 0.10.8
+#Summary: MediaPipe is the simplest way for researchers and developers to build world-class ML solutions and applications for mobile, edge, cloud and the web.
+#Home-page: https://github.com/google/mediapipe
+#Author: The MediaPipe Authors
+
+# Go to the folder with all the code. For example:
+cd .\SUSESO\Code_synchronising_cameras
+
+# This function does the 3D reconstruction
+python bodypose3d.py
+
+# This function plots the results
+python show_3d_pose.py
+
+```
