@@ -2,7 +2,7 @@
 Este repositorio contiene el código preliminar para la reconstruir la marcha en 3D del Proyecto SUSESO
 
 ## Cómo usarlo
-0. Imprima un a imagen de un tablero de ajedrez. Recomendamos imprimir [este ejemplo.](https://raw.githubusercontent.com/MarkHedleyJones/markhedleyjones.github.io/master/media/calibration-checkerboard-collection/Checkerboard-A3-35mm-8x6.pdf) Asegúrese de que al imprimir, la opción de "ajustar al tamaño de la página" está deseleccionada.
+0. Imprima una imagen de un tablero de ajedrez de 7 filas por 9 columnas, ya que por defecto se asumen estas dimensiones. Recomendamos imprimir [este ejemplo](https://markhedleyjones.com/media/calibration-checkerboard-collection/Checkerboard-A4-30mm-8x6.pdf) que contiene cuadros de 30 mm x 30 mm. Recomendamos que los tableros tengan cuadros de al menos 20 mm x 20 mm para la correcta identificación de los vértices a una distancia razonable de las cámaras (1 a 3 metros). Asegúrese de que al imprimir, la opción de "ajustar al tamaño de la página" está deseleccionada.
    
 1. Descargue los archivos:
    1. Calibrate_both_cameras.ipynb
